@@ -10,7 +10,7 @@ class Book:
     key: str
     title: str
     authors: tuple[str, ...]
-    first_publish_year: int
+    first_publish_year: int | None
     edition_count: int
     isbns: tuple[str, ...]
     subjects: tuple[str, ...]
@@ -28,7 +28,7 @@ class Book:
             key=data["key"],
             title=data.get("title", ""),
             authors=tuple(data.get("author_name") or ()),
-            first_publish_year=data["first_publish_year"],
+            first_publish_year=data.get("first_publish_year"),
             edition_count=data.get("edition_count", 0),
             isbns=tuple((data.get("isbn") or [])[:5]),
             subjects=tuple((data.get("subject") or [])[:10]),
