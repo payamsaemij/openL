@@ -18,6 +18,7 @@ CSV_FIELDS = [
     "url",
 ]
 
+
 def book_to_row(book: Book) -> dict[str, str | int | None]:
     """Flatten a Book into a single CSV row.
 
