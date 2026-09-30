@@ -19,7 +19,16 @@ CSV_FIELDS = [
 ]
 
 def book_to_row(book: Book) -> dict[str, str | int | None]:
-    """Convert a Book instance to a CSV row."""
+    """Flatten a Book into a single CSV row.
+
+    List fields such as authors and isbns are joined with "; ".
+
+    Args:
+        book (Book): Book instance to convert.
+
+    Returns:
+        dict[str, str | int | None]: Mapping of CSV column name to value.
+    """
     return {
         "key": book.key,
         "title": book.title,
@@ -37,7 +46,18 @@ def export_to_csv(
     books: list[Book],
     output: str | Path,
 ) -> Path:
-    """Write books to a CSV file and return its path."""
+    """Write books to a CSV file with a fixed column order.
+
+    Parent directories are created if missing. The file is written as
+    UTF-8 with BOM so spreadsheet apps detect the encoding.
+
+    Args:
+        books (list[Book]): Books to export.
+        output (str | Path): Destination CSV path.
+
+    Returns:
+        Path: Path of the written CSV file.
+    """
     path = Path(output)
     path.parent.mkdir(parents=True, exist_ok=True)
 

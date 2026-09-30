@@ -9,7 +9,11 @@ from openlibrary.service import BookService
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Create the CLI argument parser."""
+    """Build the CLI argument parser.
+
+    Returns:
+        argparse.ArgumentParser: Parser with all CLI options configured.
+    """
     parser = argparse.ArgumentParser(
         prog="openlibrary",
         description=(
@@ -50,7 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def configure_logging(verbose: bool) -> None:
-    """Configure application logging."""
+    """Configure root logging for the CLI run.
+
+    Args:
+        verbose (bool): If True, log at INFO level; else WARNING only.
+    """
     logging.basicConfig(
         level=logging.INFO if verbose else logging.WARNING,
         format="%(levelname)s: %(message)s",
@@ -58,7 +66,18 @@ def configure_logging(verbose: bool) -> None:
 
 
 def run(args: argparse.Namespace) -> int:
-    """Execute the book collection workflow."""
+    """Execute the pipeline: validate, fetch, filter, and export books.
+
+    Args:
+        args (argparse.Namespace): Parsed CLI arguments.
+
+    Raises:
+        ValueError: If book count is not greater than zero.
+        ValueError: If the search pattern is empty.
+
+    Returns:
+        int: Exit code; 0 on success, 1 when no books matched.
+    """
     configure_logging(args.verbose)
 
     if args.count <= 0:
@@ -98,7 +117,11 @@ def run(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    """CLI entry point."""
+    """CLI entry point: parse arguments and handle common errors.
+
+    Returns:
+        int: Process exit code.
+    """
     parser = build_parser()
     args = parser.parse_args()
 

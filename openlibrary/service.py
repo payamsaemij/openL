@@ -11,7 +11,13 @@ logger = logging.getLogger(__name__)
 
 
 class BookService:
-    """Collect matching books from Open Library."""
+    """Collect filtered books from Open Library, page by page.
+
+    Attributes:
+        client (OpenLibraryClient): Client used for search requests.
+        page_size (int): Results requested per API call.
+        delay (float): Pause in seconds between consecutive pages.
+    """
 
     def __init__(
         self,
@@ -19,6 +25,15 @@ class BookService:
         page_size: int = 100,
         delay: float = 0.2,
     ) -> None:
+        """Store the API client and pagination settings.
+
+        Args:
+            client (OpenLibraryClient): Client used to query the API.
+            page_size (int, optional): Results per request.
+                Defaults to 100.
+            delay (float, optional): Pause between requests in seconds.
+                Defaults to 0.2.
+        """
         self.client = client
         self.page_size = page_size
         self.delay = delay
@@ -29,8 +44,25 @@ class BookService:
         pattern: str,
         after_year: int,
     ) -> list[Book]:
-        """Fetch up to count unique matching books."""
+        """Collect up to count books matching pattern and after_year.
 
+        Pages through search results, skipping duplicates and invalid
+        records, and stops early when results run out.
+
+        Args:
+            count (int): Maximum number of books to collect.
+            pattern (str): Required title substring; also the API query.
+            after_year (int): Keep only books first published after
+                this year.
+
+        Raises:
+            ValueError: If count is not greater than zero.
+            ValueError: If pattern is empty or only whitespace.
+            ValueError: If page_size is not greater than zero.
+
+        Returns:
+            list[Book]: Matching books, at most count entries.
+        """
         if count <= 0:
             raise ValueError(
                 "Book count must be greater than zero."

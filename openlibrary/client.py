@@ -4,7 +4,11 @@ import requests
 
 
 class OpenLibraryClient:
-    """A small client for Open Library search."""
+    """HTTP client for the Open Library search API.
+
+    Keeps one requests session alive across calls and supports use as
+    a context manager.
+    """
 
     BASE_URL = "https://openlibrary.org/search.json"
 
@@ -20,6 +24,12 @@ class OpenLibraryClient:
     ]
 
     def __init__(self, timeout: int = 30) -> None:
+        """Create a client with a shared HTTP session.
+
+        Args:
+            timeout (int, optional): Per-request timeout in seconds.
+                Defaults to 30.
+        """
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update({
@@ -32,7 +42,19 @@ class OpenLibraryClient:
         limit: int = 100,
         offset: int = 0,
     ) -> dict:
-        """Search books and return the API response."""
+        """Search books and return the parsed JSON response.
+
+        Args:
+            query (str): Free-text search query.
+            limit (int, optional): Results per page. Defaults to 100.
+            offset (int, optional): Pagination offset. Defaults to 0.
+
+        Returns:
+            dict: Decoded JSON with "docs" and "numFound" keys.
+
+        Raises:
+            requests.HTTPError: If the API returns an error status.
+        """
         params = {
             "q": query,
             "fields": ",".join(self.FIELDS),
@@ -54,7 +76,9 @@ class OpenLibraryClient:
         self.session.close()
 
     def __enter__(self) -> "OpenLibraryClient":
+        """Return the client itself for use in a with block."""
         return self
 
     def __exit__(self, *args: object) -> None:
+        """Close the session when exiting the with block."""
         self.close()
