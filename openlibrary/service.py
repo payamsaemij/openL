@@ -30,6 +30,22 @@ class BookService:
         after_year: int,
     ) -> list[Book]:
         """Fetch up to count unique matching books."""
+
+        if count <= 0:
+            raise ValueError(
+                "Book count must be greater than zero."
+            )
+
+        if not pattern or not pattern.strip():
+            raise ValueError(
+                "Search pattern cannot be empty."
+            )
+
+        if self.page_size <= 0:
+            raise ValueError(
+                "Page size must be greater than zero."
+            )
+
         books: list[Book] = []
         seen: set[str] = set()
         offset = 0
@@ -53,6 +69,13 @@ class BookService:
                 break
 
             for document in documents:
+                if not isinstance(document, dict):
+                    logger.warning(
+                        "Skipping invalid book document: %r",
+                        document,
+                    )
+                    continue
+
                 key = document.get("key")
 
                 if not key or key in seen:
@@ -62,18 +85,21 @@ class BookService:
                     book = Book.from_api(document)
                 except (KeyError, TypeError, ValueError):
                     logger.warning(
-                        "Skipping invalid book record: %s", key
+                        "Skipping invalid book record: %s",
+                        key,
                     )
                     continue
 
-                if not is_valid_book(book, pattern, after_year):
+                if not is_valid_book(
+                    book, pattern, after_year
+                ):
                     continue
 
                 books.append(book)
                 seen.add(key)
 
                 logger.info(
-                    "Matched %d/%d: %s (%d)",
+                    "Matched %d/%d: %s (%s)",
                     len(books),
                     count,
                     book.title,
@@ -86,7 +112,9 @@ class BookService:
             offset += len(documents)
 
             if offset >= total:
-                logger.info("Reached end of search results.")
+                logger.info(
+                    "Reached end of search results."
+                )
                 break
 
             if self.delay > 0:
