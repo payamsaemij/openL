@@ -78,7 +78,7 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install requests
+pip install requirements.txt
 ```
 
 ## Usage
