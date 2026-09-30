@@ -7,6 +7,7 @@ from openlibrary.models import Book
 
 
 CSV_FIELDS = [
+    "key",
     "title",
     "authors",
     "first_publish_year",
@@ -17,10 +18,10 @@ CSV_FIELDS = [
     "url",
 ]
 
-
-def book_to_row(book: Book) -> dict[str, str | int]:
+def book_to_row(book: Book) -> dict[str, str | int | None]:
     """Convert a Book instance to a CSV row."""
     return {
+        "key": book.key,
         "title": book.title,
         "authors": "; ".join(book.authors),
         "first_publish_year": book.first_publish_year,
