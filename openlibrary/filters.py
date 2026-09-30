@@ -10,7 +10,11 @@ def matches_pattern(book: Book, pattern: str) -> bool:
 
 def is_published_after(book: Book, year: int) -> bool:
     """Check whether the first publication year is after year."""
-    return book.first_publish_year > year
+
+    return (
+        book.first_publish_year is not None
+        and book.first_publish_year > year
+    )
 
 
 def is_valid_book(
